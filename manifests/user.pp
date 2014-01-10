@@ -11,12 +11,14 @@
 # Sample Usage:
 #
 
+include cspace_environment::env
 include cspace_environment::osfamily
 include stdlib # for file_line
 
 class cspace_user::user {
 
   $os_family = $cspace_environment::osfamily::os_family
+  $env_vars  = $cspace_environment::env::cspace_env # hash
   include cspace_user
   $user_acct = $cspace_user::user_acct_name
   
