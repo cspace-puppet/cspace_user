@@ -12,12 +12,12 @@
 #
 
 include cspace_environment::osfamily
-include cspace_user
 include stdlib # for file_line
 
-class cspace_user::user () {
+class cspace_user::user {
 
   $os_family = $cspace_environment::osfamily::os_family
+  include cspace_user
   $user_acct = $cspace_user::user_acct_name
   
   # ---------------------------------------------------------
