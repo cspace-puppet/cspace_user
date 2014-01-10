@@ -109,7 +109,7 @@ class cspace_user::user {
       file_line { 'Write environment variables to bash profile':
         ensure  => present,
         path    => "/home/${user_acct}/.bashrc",
-        line    => template('cspace_environment/env_vars.erb'),
+        line    => template('cspace_user/env_vars.erb'),
         require => File[ 'Ensure presence of bashrc file' ],
       }
 
