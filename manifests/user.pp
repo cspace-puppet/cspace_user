@@ -11,7 +11,6 @@
 # Sample Usage:
 #
 
-include cspace_environment::env
 include cspace_environment::osfamily
 include stdlib # for file_line
 
@@ -108,6 +107,9 @@ class cspace_user::user {
       }
       $starting_delimiter = '# Start of environment variable declarations inserted by Puppet code'
       $ending_delimiter   = '# End of environment variable declations inserted by Puppet code'
+      # The 'env_vars.erb' template, invoked below, expects to find an $env_vars hash
+      include cspace_environment::env
+      $env_vars = $cspace_environment::env::cspace_env
       file_line { 'Write environment variables to bash profile':
         ensure  => present,
         path    => "/home/${user_acct}/.bashrc",
