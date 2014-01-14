@@ -28,3 +28,5 @@ ENDDOC
       returnval = false
     end
     return returnval
+  end
+end

@@ -12,14 +12,14 @@
 #
 
 include cspace_environment::osfamily
-include stdlib # for file_line, merge()
+include stdlib # for file_line
 
 class cspace_user::user {
 
   $os_family = $cspace_environment::osfamily::os_family
   
   include cspace_user::env
-  $env_vars_before_java_home_update = $cspace_environment::env::cspace_env # hash
+  $env_vars_before_java_home_update = $cspace_user::env::cspace_env # hash
   
   include cspace_user
   $user_acct = $cspace_user::user_acct_name
