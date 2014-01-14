@@ -18,24 +18,8 @@ class cspace_user::user {
 
   $os_family = $cspace_environment::osfamily::os_family
   
-  include cspace_environment::env
+  include cspace_user::env
   $env_vars_before_java_home_update = $cspace_environment::env::cspace_env # hash
-  
-  # FIXME: Hack to update JAVA_HOME after $cspace_environment::env::cspace_env
-  # was initially set, in case that hash's JAVA_HOME value is missing, empty, or
-  # reflects an installation of OpenJDK and/or an older version of Oracle Java SE,
-  # since obsoleted by subsequent installation of a current version of the latter.
-  #
-  # Doing this depends on the cspace_environment::env_java_home sub-module not
-  # being instantiated at any point in the puppet catalog sequence prior to
-  # this point. It also forcibly overrides any value for JAVA_HOME that may
-  # be present in the running user's environment.
-  #
-  # This should be handled this more adroitly.
-  include cspace_environment::env_java_home
-  $java_home =
-    { 'JAVA_HOME' => $cspace_environment::env_java_home::default_java_home }
-  $env_vars = merge( $env_vars_before_java_home_update, $java_home )
   
   include cspace_user
   $user_acct = $cspace_user::user_acct_name
