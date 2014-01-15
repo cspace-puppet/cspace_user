@@ -11,9 +11,17 @@
 
 # Path to the 'alternatives' command on Debian and RedHat-based systems.
 # (On RedHat-based systems, this path is an alias to '/usr/sbin/alternatives'.)
-ALTERNATIVES_COMMAND  = '/usr/sbin/update-alternatives'
+ALTERNATIVES_COMMAND     = '/usr/sbin/update-alternatives'
+
 # Relative path to the 'java' executable within a JAVA_HOME directory
-RELATIVE_PATH_TO_JAVA = '/bin/java'
+RELATIVE_PATH_TO_JAVA    = '/bin/java'
+
+# Oracle's convention for Java SE 7 on RedHat Linux-based systems appears to be to create
+# a '/usr/java/latest' symlink which will always point to the latest Java version.
+# See http://www.oracle.com/technetwork/java/javase/install-linux-rpm-137089.html
+# (The corresponding 64-bit JDK installation page doesn't mention this convention,
+# but the same behavior was observed with Oracle's Java SE 64-bit RPM packages.)
+DEFAULT_REDHAT_JAVA_HOME = '/usr/java/latest'
 
 # ---------------------------------------------------
 # Utility functions
@@ -104,15 +112,8 @@ ENDDOC
         java_home = ''
         
         # Use the default directory for Oracle Java installations, if present.
-        #
-        # Oracle's convention for Java SE 7 on RedHat Linux-based systems appears to be to create
-        # a '/usr/java/latest' symlink which will always point to the latest Java version.
-        # See http://www.oracle.com/technetwork/java/javase/install-linux-rpm-137089.html
-        # (The corresponding 64-bit JDK installation page doesn't mention this convention,
-        # but the same behavior was observed with Oracle's Java SE 64-bit RPM packages.)
-        JAVA_HOME_DEFAULT = '/usr/java/latest'
-        if FileTest.executable?( "#{JAVA_HOME_DEFAULT}/bin/java" )
-          java_home = "#{JAVA_HOME_DEFAULT}"
+        if FileTest.executable?( "#{DEFAULT_REDHAT_JAVA_HOME}/bin/java" )
+          java_home = "#{DEFAULT_REDHAT_JAVA_HOME}"
         end
         
         # Next use the value, if any, returned by the 'alternatives' command.
