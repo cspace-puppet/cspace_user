@@ -45,24 +45,24 @@ end
 # Returns the 'best' alternative path to the 'java' executable via
 # the Linux 'alternatives' system. (For a summary of that system,
 # see, for example, http://linux.about.com/library/cmd/blcmdl8_alternatives.htm)
-def env_java_alternatives()
-  java_alternative_val = ''
+def java_alternatives_path()
+  java_alternatives_val = ''
   # Run the relevant alternatives command, retrieve the output line containing 'best',
   # extract the path from the fifth (space-delineated) field on that line,
   # and strip off the trailing 'bin/java' from that path to yield
   # a candidate directory path.
   if FileTest.executable?( "#{ALTERNATIVES_COMMAND}" )
-    java_alternative_candidate = \
+    java_alternatives_candidate = \
       `#{ALTERNATIVES_COMMAND} --display java | /bin/grep best | cut -f 5 -d ' '` \
         .sub(/\/bin\/java.$/,"") \
         .chomp
   end
-  if java_alternative_candidate.to_s.strip.length > 0
-    if FileTest.executable?( "#{java_alternative_candidate}#{RELATIVE_PATH_TO_JAVA}" )
-      java_alternative_val = java_alternative_candidate
+  if java_alternatives_candidate.to_s.strip.length > 0
+    if FileTest.executable?( "#{java_alternatives_candidate}#{RELATIVE_PATH_TO_JAVA}" )
+      java_alternatives_val = java_alternatives_candidate
     end
   end
-  return java_alternative_val
+  return java_alternatives_val
 end
 
 # ---------------------------------------------------
@@ -99,7 +99,7 @@ ENDDOC
 
         # Use the value, if any, returned by the 'alternatives' command.
         if java_home.to_s.strip.length == 0
-          java_home = env_java_alternatives()
+          java_home = java_alternatives_path()
         end
                 
         # Fall back to the value of the JAVA_HOME environment variable, if present.
@@ -112,13 +112,13 @@ ENDDOC
         java_home = ''
         
         # Use the default directory for Oracle Java installations, if present.
-        if FileTest.executable?( "#{DEFAULT_REDHAT_JAVA_HOME}/bin/java" )
+        if FileTest.executable?( "#{DEFAULT_REDHAT_JAVA_HOME}#{RELATIVE_PATH_TO_JAVA}" )
           java_home = "#{DEFAULT_REDHAT_JAVA_HOME}"
         end
         
         # Next use the value, if any, returned by the 'alternatives' command.
         if java_home.to_s.strip.length == 0
-          java_home = env_java_alternatives()
+          java_home = java_alternatives_path()
         end
         
         # Fall back to the value of the JAVA_HOME environment variable, if present.
