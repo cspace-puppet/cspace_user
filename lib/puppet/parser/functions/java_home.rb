@@ -47,13 +47,13 @@ end
 # see, for example, http://linux.about.com/library/cmd/blcmdl8_alternatives.htm)
 def java_alternatives_path()
   java_alternatives_val = ''
-  # Run the relevant alternatives command, retrieve the output line containing 'best',
-  # extract the path from the fifth (space-delineated) field on that line,
-  # and strip off the trailing 'bin/java' from that path to yield
-  # a candidate directory path.
+  # Run the relevant alternatives command, retrieve the output line containing
+  # "Link currently points to", extract the path from the sixth (space-delineated)
+  # field on that line, strip off the trailing '/bin/java' from that path, and
+  # 'chomp' off the trailing EOL character, to yield a candidate directory path.
   if FileTest.executable?( "#{ALTERNATIVES_COMMAND}" )
     java_alternatives_candidate = \
-      `#{ALTERNATIVES_COMMAND} --display java | /bin/grep best | cut -f 5 -d ' '` \
+      `#{ALTERNATIVES_COMMAND} --display java | /bin/grep "currently points to" | cut -f 6 -d ' '` \
         .sub(/\/bin\/java.$/,"") \
         .chomp
   end
