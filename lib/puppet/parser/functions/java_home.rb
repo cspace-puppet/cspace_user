@@ -23,6 +23,10 @@ RELATIVE_PATH_TO_JAVA    = '/bin/java'
 # but the same behavior was observed with Oracle's Java SE 64-bit RPM packages.)
 DEFAULT_REDHAT_JAVA_HOME = '/usr/java/latest'
 
+# The OS X utility 'java_home' "returns the path to a Java home directory from
+# the current user's settings."
+OSX_JAVA_HOME_UTILITY_PATH = '/usr/libexec/java_home'
+
 # ---------------------------------------------------
 # Utility functions
 # ---------------------------------------------------
@@ -48,12 +52,12 @@ end
 def java_alternatives_path()
   java_alternatives_val = ''
   # Run the relevant alternatives command, retrieve the output line containing
-  # "Link currently points to", extract the path from the sixth (space-delineated)
+  # "link currently points to", extract the path from the sixth (space-delineated)
   # field on that line, strip off the trailing '/bin/java' from that path, and
   # 'chomp' off the trailing EOL character, to yield a candidate directory path.
   if FileTest.executable?( "#{ALTERNATIVES_COMMAND}" )
     java_alternatives_candidate = \
-      `#{ALTERNATIVES_COMMAND} --display java | /bin/grep "currently points to" | cut -f 6 -d ' '` \
+      `#{ALTERNATIVES_COMMAND} --display java | /bin/grep "link currently points to" | cut -f 6 -d ' '` \
         .sub(/\/bin\/java.$/,"") \
         .chomp
   end
@@ -131,11 +135,9 @@ ENDDOC
     
         java_home = ''
         
-        # Default to returning the value provided by the 'java_home' OS X utility, which
-        # "returns the path to a Java home directory from the current user's settings."
-        JAVA_HOME_UTILITY_PATH = '/usr/libexec/java_home'
-        if FileTest.executable?( "#{JAVA_HOME_UTILITY_PATH}" )
-          java_home_candidate = `#{JAVA_HOME_UTILITY_PATH}`
+        # Use the value, if any, returned by the OS X utility 'java_home'.
+        if FileTest.executable?( "#{OSX_JAVA_HOME_UTILITY_PATH}" )
+          java_home_candidate = `#{OSX_JAVA_HOME_UTILITY_PATH}`
           if java_home_candidate.to_s.strip.length > 0
             java_home_candidate = java_home_candidate.strip # remove trailing EOL char
             if FileTest.executable?( "#{java_home_candidate}#{RELATIVE_PATH_TO_JAVA}" )
