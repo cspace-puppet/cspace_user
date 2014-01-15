@@ -26,31 +26,81 @@ ENDDOC
     # Any arguments passed to this function are ignored.
     
     os_family             = lookupvar('osfamily')
-    relative_path_to_java = '/bin/java'
+    
+    # Path to the 'alternatives' command on Debian and RedHat-based systems.
+    # (On RedHat-based systems, this path is an alias to '/usr/sbin/alternatives'.)
+    ALTERNATIVES_COMMAND  = '/usr/sbin/update-alternatives'
+    # Relative path to the 'java' executable within a JAVA_HOME directory
+    RELATIVE_PATH_TO_JAVA = '/bin/java'
 
+    # ---------------------------------------------------
+    # Utility functions
+    # ---------------------------------------------------
+    
     # Returns the value of the JAVA_HOME environment variable
     # for the effective current user.
-    def env_java_home_value()
+    def env_java_home()
       env_java_home_val = ''
       env_java_home     = ENV[ 'JAVA_HOME' ]
+      # Re this 'nil or empty' test, see http://stackoverflow.com/a/251644
       if env_java_home.to_s.strip.length > 0
-        if File.executable?( "#{env_java_home}#{relative_path_to_java}" )
+        # Ensure that this candidate path contains a 'java' executable file
+        if File.executable?( "#{env_java_home}#{RELATIVE_PATH_TO_JAVA}" )
           env_java_home_val = env_java_home
         end
       end
       return env_java_home_val
     end
     
+    # Returns the 'best' alternative path to the 'java' executable via
+    # the Linux 'alternatives' system. (For a summary of that system,
+    # see, for example, http://linux.about.com/library/cmd/blcmdl8_alternatives.htm)
+    def env_java_alternatives()
+      java_alternative_val = ''
+      # Run the relevant alternatives command, retrieve the output line containing 'best',
+      # extract the path from the fifth (space-delineated) field on that line,
+      # and strip off the trailing 'bin/java' from that path to yield
+      # a candidate directory path.
+      if File.executable?( "#{ALTERNATIVES_COMMAND}" )
+        java_alternative_candidate = \
+          %x( "#{ALTERNATIVES_COMMAND} --display java | /bin/grep best | cut -f 5 -d ' '" ) \
+            .sub(/\/bin\/java.$/,"") \
+            .chomp
+      end
+      if java_alternative_candidate.to_s.strip.length > 0
+        if File.executable?( "#{java_alternative_candidate}#{RELATIVE_PATH_TO_JAVA}" )
+          java_alternative_val = java_alternative_candidate
+        end
+      end
+      return java_alternative_val
+    end
+    
+    # ---------------------------------------------------
+    # Main code block, with behavior varying by platform
+    # ---------------------------------------------------
+    
     case os_family
       
       when 'Debian'
+        
         java_home = ''
+
+        # Use the value, if any, returned by the 'alternatives' command.
+        if java_home.to_s.strip.length == 0
+          java_home = env_java_alternatives()
+        end
+                
+        # Fall back to the value of the JAVA_HOME environment variable, if present.
+        if java_home.to_s.strip.length == 0
+          java_home = env_java_home()
+        end
         
       when 'RedHat'
         
         java_home = ''
         
         # Use the default directory for Oracle Java installations, if present.
+        #
         # Oracle's convention for Java SE 7 on RedHat Linux-based systems appears to be to create
         # a '/usr/java/latest' symlink which will always point to the latest Java version.
         # See http://www.oracle.com/technetwork/java/javase/install-linux-rpm-137089.html
@@ -61,9 +111,14 @@ ENDDOC
           java_home = `#{JAVA_HOME_DEFAULT}`
         end
         
+        # Next use the value, if any, returned by the 'alternatives' command.
+        if java_home.to_s.strip.length == 0
+          java_home = env_java_alternatives()
+        end
+        
         # Fall back to the value of the JAVA_HOME environment variable, if present.
         if java_home.to_s.strip.length == 0
-          java_home = env_java_home_value()
+          java_home = env_java_home()
         end
                 
       # OS X
@@ -76,10 +131,9 @@ ENDDOC
         JAVA_HOME_UTILITY_PATH = '/usr/libexec/java_home'
         if File.executable?( "#{JAVA_HOME_UTILITY_PATH}" )
           java_home_candidate = `#{JAVA_HOME_UTILITY_PATH}`
-          # For this test, see http://stackoverflow.com/a/251644
           if java_home_candidate.to_s.strip.length > 0
             java_home_candidate = java_home_candidate.strip # remove trailing EOL char
-            if File.executable?( "#{java_home_candidate}#{relative_path_to_java}" )
+            if File.executable?( "#{java_home_candidate}#{RELATIVE_PATH_TO_JAVA}" )
               java_home = java_home_candidate
             end
           end
@@ -87,7 +141,7 @@ ENDDOC
         
         # Fall back to the value of the JAVA_HOME environment variable, if present.
         if java_home.to_s.strip.length == 0
-          java_home = env_java_home_value()
+          java_home = env_java_home()
         end
                 
       # Microsoft Windows
@@ -101,24 +155,6 @@ ENDDOC
     end # case
     
     return java_home
-    
-    
-  #       confine :kernel => "Linux"
-  #       if File.exists?("/usr/sbin/alternatives")
-  #         %x{/usr/sbin/alternatives  --display java | /bin/grep best | cut -f 5 -d ' ' } \
-  #           .sub(/\/bin\/java.$/,"") \
-  #           .chomp
-  #       end
-  #   
-  #   confine :kernel => "Darwin"
 
-  #   
-  #   if FileTest.directory?(dirpath)
-  #     returnval = true
-  #   else
-  #     returnval = false
-  #   end
-  #   return returnval
-  
   end
 end
