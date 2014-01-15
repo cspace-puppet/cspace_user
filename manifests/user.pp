@@ -118,6 +118,12 @@ class cspace_user::user {
         line    => template('cspace_user/env_vars.erb'),
         require => File[ 'Ensure presence of bashrc file' ],
       }
+      file_line { 'Write JAVA_HOME environment variable to bash profile':
+        ensure  => present,
+        path    => "/home/${user_acct}/.bashrc",
+        line    => template('cspace_user/env_var_java_home.erb'),
+        require => File_line[ 'Write environment variables to bash profile' ],
+      }
 
     }
     # OS X
