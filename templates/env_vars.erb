@@ -1,4 +1,4 @@
-
+<%# A leading blank line will be intentionally inserted in template output here, via this comment %>
 <%= @starting_delimiter %>
 <% if (@env_vars != nil) && (@env_vars.respond_to?(:to_hash)) then %>
 <% @env_vars.each_pair do |key, value| %>export <%= key %>='<%= value %>'
