@@ -112,7 +112,7 @@ ENDDOC
         # but the same behavior was observed with Oracle's Java SE 64-bit RPM packages.)
         JAVA_HOME_DEFAULT = '/usr/java/latest'
         if FileTest.executable?( "#{JAVA_HOME_DEFAULT}/bin/java" )
-          java_home = `#{JAVA_HOME_DEFAULT}`
+          java_home = "#{JAVA_HOME_DEFAULT}"
         end
         
         # Next use the value, if any, returned by the 'alternatives' command.
