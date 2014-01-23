@@ -60,7 +60,10 @@ def java_alternatives_path()
     alternatives_cmd_output = \
       `#{ALTERNATIVES_COMMAND} --display java`
     alternatives_cmd_output =~ /\s*link currently points to(.*)/
-    java_alternatives_candidate = $1.sub( /\/bin\/java/, "" ).strip
+    java_alternatives_candidate = ''
+    if alternatives_cmd_output.to_s.strip.length > 0
+      java_alternatives_candidate = $1.sub(/\/bin\/java/,"").strip
+    end
   end
   if java_alternatives_candidate.to_s.strip.length > 0
     if FileTest.executable?( "#{java_alternatives_candidate}#{RELATIVE_PATH_TO_JAVA}" )
