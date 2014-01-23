@@ -46,7 +46,7 @@ def env_java_home()
   return env_java_home_val
 end
 
-# Returns the 'best' alternative path to the 'java' executable via
+# Returns the current alternative path to the 'java' executable via
 # the Linux 'alternatives' system. (For a summary of that system,
 # see, for example, http://linux.about.com/library/cmd/blcmdl8_alternatives.htm)
 def java_alternatives_path()
