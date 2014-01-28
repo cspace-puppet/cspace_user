@@ -120,7 +120,7 @@ ENDDOC
         java_home = ''
         
         # Use the default directory for Oracle Java installations, if present.
-        if FileTest.executable?( "#{DEFAULT_REDHAT_JAVA_HOME}#{RELATIVE_PATH_TO_JAVA}" )
+        if FileTest.exists?( "#{DEFAULT_REDHAT_JAVA_HOME}#{RELATIVE_PATH_TO_JAVA}" )
           java_home = "#{DEFAULT_REDHAT_JAVA_HOME}"
         end
         
