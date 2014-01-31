@@ -3,11 +3,6 @@
 # Script to write the probable location of the JAVA_HOME directory, if present,
 # to a user's (bash or bash-compatible) shell configuration file.
 
-# See also "Custom Functions":
-# http://docs.puppetlabs.com/guides/custom_functions.html
-# and "Plugins in Modules"
-# http://docs.puppetlabs.com/guides/plugins_in_modules.html
-
 # Requires the Facter Ruby Gem, typically installed with Puppet.
 require 'facter'
 # TODO: Test whether the following is actually needed. See:
