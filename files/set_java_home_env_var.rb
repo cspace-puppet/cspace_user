@@ -15,11 +15,34 @@ require 'facter'
 ENV['FACTERLIB'] = "/var/lib/puppet/lib/facter:/var/lib/puppet/facts"
 
 # ---------------------------------------------------
+# Constants
+# ---------------------------------------------------
+
+# Path to the 'alternatives' command on Debian and RedHat-based systems.
+# (On RedHat-based systems, this path is an alias to '/usr/sbin/alternatives'.)
+ALTERNATIVES_COMMAND     = '/usr/sbin/update-alternatives'
+
+# Relative path to the 'java' executable within a JAVA_HOME directory
+RELATIVE_PATH_TO_JAVA    = '/bin/java'
+
+# Oracle's convention for Java SE 7 on RedHat Linux-based systems appears to be to create
+# a '/usr/java/latest' symlink which will always point to the latest Java version.
+# See http://www.oracle.com/technetwork/java/javase/install-linux-rpm-137089.html
+# (The corresponding 64-bit JDK installation page doesn't mention this convention,
+# but the same behavior was observed with Oracle's Java SE 64-bit RPM packages.)
+DEFAULT_REDHAT_JAVA_HOME = '/usr/java/latest'
+
+# The OS X utility 'java_home' "returns the path to a Java home directory from
+# the current user's settings."
+OSX_JAVA_HOME_UTILITY_PATH = '/usr/libexec/java_home'
+
+# ---------------------------------------------------
 # Utility functions
 # ---------------------------------------------------
 
 # Returns the value of the JAVA_HOME environment variable
 # for the effective current user.
+
 def env_java_home()
   env_java_home_val = ''
   env_java_home     = ENV[ 'JAVA_HOME' ]
@@ -36,6 +59,7 @@ end
 # Returns the current alternative path to the 'java' executable via
 # the Linux 'alternatives' system. (For a summary of that system,
 # see, for example, http://linux.about.com/library/cmd/blcmdl8_alternatives.htm)
+
 def java_alternatives_path()
   java_alternatives_val = ''
   # Run the relevant alternatives command, retrieve the output
@@ -60,12 +84,16 @@ def java_alternatives_path()
   return java_alternatives_val
 end
 
+# Replaces a matched text line in a file, with substitute text.
+# If that line isn't found, appends the substitute text to that file anyway.
+#
 # FIXME: This isn't the safest way to substitute text within, or append to, a file,
 # as it may fail messily when too little space is left in a filesystem, etc.
 # For on a more involved, but more robust, approach, see:
 # http://stackoverflow.com/a/4174125
 # and especially:
 # http://stackoverflow.com/a/2192010
+
 def replace_or_append_text_in_file( file, find_regex, replacement_text )
   filetext = File.read file
   File.open( file, 'w+' ) { |f|
@@ -78,32 +106,11 @@ def replace_or_append_text_in_file( file, find_regex, replacement_text )
 end
 
 # ---------------------------------------------------
-# Constants
-# ---------------------------------------------------
-
-# Path to the 'alternatives' command on Debian and RedHat-based systems.
-# (On RedHat-based systems, this path is an alias to '/usr/sbin/alternatives'.)
-ALTERNATIVES_COMMAND     = '/usr/sbin/update-alternatives'
-
-# Relative path to the 'java' executable within a JAVA_HOME directory
-RELATIVE_PATH_TO_JAVA    = '/bin/java'
-
-# Oracle's convention for Java SE 7 on RedHat Linux-based systems appears to be to create
-# a '/usr/java/latest' symlink which will always point to the latest Java version.
-# See http://www.oracle.com/technetwork/java/javase/install-linux-rpm-137089.html
-# (The corresponding 64-bit JDK installation page doesn't mention this convention,
-# but the same behavior was observed with Oracle's Java SE 64-bit RPM packages.)
-DEFAULT_REDHAT_JAVA_HOME = '/usr/java/latest'
-
-# The OS X utility 'java_home' "returns the path to a Java home directory from
-# the current user's settings."
-OSX_JAVA_HOME_UTILITY_PATH = '/usr/libexec/java_home'
-
-# ---------------------------------------------------
 # Main code block, with behavior varying by platform
 # ---------------------------------------------------
 
-# Get 
+# Get the path to the specified config file from command line arguments.
+
 filepath = ARGV[0]
 if filepath.to_s.strip.length == 0
   scriptname = File.basename($0)
@@ -117,6 +124,14 @@ if filepath.to_s.strip.length == 0
   exit 1
 end
 
+if (! FileTest.writable?(filepath)) 
+  puts "File '#{filepath}' either doesn't exist or isn't writeable by the effective user."
+  exit 1
+end
+
+# Retrieve the Facter 'fact' for the operating system family
+# under which this script is running.
+
 begin
   Facter.mysql_master
 rescue
@@ -125,7 +140,7 @@ end
 os_family = Facter.value('osfamily')
 
 # Obtain a candidate value for the JAVA_HOME environment variable,
-# depending on platform
+# based on heuristics specific to each operating system family.
 
 case os_family
   
@@ -185,6 +200,7 @@ case os_family
             
   # Microsoft Windows
   when 'windows'
+    # TODO: Add code here to handle this case under Windows.
     java_home = ''
     
   # Default
@@ -193,11 +209,12 @@ case os_family
     
 end # case
 
-# Write that value to the supplied file, either replacing an existing
-# declaration of JAVA_HOME or appending it if not already present.
+# Writes a statement to the supplied config file, setting (declaring) the JAVA HOME
+# environment variable. Either replaces existing declarations of JAVA_HOME, if any,
+# with the new declaration, or appends a new declaration if it wasn't already present.
 
-# The following assumes a 'bash' or comparable shell that uses
-# 'export' to set values of environment variables.
+# The following patterns assume a 'bash' or comparable shell that uses
+# 'export ENV_VAR_NAME=...' to set values of environment variables.
 find_regex       = /export\s+JAVA_HOME\s+=\s+.*/
 replacement_text = "export JAVA_HOME=\'#{java_home}'"
 
