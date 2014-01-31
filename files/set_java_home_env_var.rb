@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 # Script to write the probable location of the JAVA_HOME directory, if present,
-# to a user's .bashrc file.
+# to a user's (bash or bash-compatible) shell configuration file.
 
 # See also "Custom Functions":
 # http://docs.puppetlabs.com/guides/custom_functions.html
@@ -103,9 +103,17 @@ OSX_JAVA_HOME_UTILITY_PATH = '/usr/libexec/java_home'
 # Main code block, with behavior varying by platform
 # ---------------------------------------------------
 
+# Get 
 filepath = ARGV[0]
 if filepath.to_s.strip.length == 0
-  puts "Usage: #{$0} filepath"
+  scriptname = File.basename($0)
+  puts "#{scriptname}"
+  puts
+  puts "Writes a statement setting the JAVA_HOME environment variable "
+  puts "to a specified config file."
+  puts "Usage:"
+  puts "  #{scriptname} filepath"
+  puts "where 'filepath' is a fully qualified path to a 'bash'-compatible config file."
   exit 1
 end
 
@@ -115,7 +123,10 @@ rescue
   Facter.loadfacts()
 end
 os_family = Facter.value('osfamily')
-    
+
+# Obtain a candidate value for the JAVA_HOME environment variable,
+# depending on platform
+
 case os_family
   
   when 'Debian'
@@ -182,8 +193,14 @@ case os_family
     
 end # case
 
+# Write that value to the supplied file, either replacing an existing
+# declaration of JAVA_HOME or appending it if not already present.
+
+# The following assumes a 'bash' or comparable shell that uses
+# 'export' to set values of environment variables.
 find_regex       = /export\s+JAVA_HOME\s+=\s+.*/
 replacement_text = "export JAVA_HOME=\'#{java_home}'"
+
 if FileTest.writable?(filepath)
   replace_or_append_text_in_file( filepath, find_regex, replacement_text )
 end
