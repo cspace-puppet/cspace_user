@@ -88,15 +88,25 @@ end
 # http://stackoverflow.com/a/4174125
 # and especially:
 # http://stackoverflow.com/a/2192010
+# and http://stackoverflow.com/a/4795561
 
 def replace_or_append_text_in_file( file, find_regex, replacement_text )
   filetext = File.read file
+  newtext  = ''
+  export_stmt = "export JAVA_HOME='#{replacement_text}'"
+  if ( filetext.match( find_regex ) != nil )
+    newtext = filetext.sub( find_regex, export_stmt )
+    # Uncomment for debugging
+    # puts "match found"
+    # puts "new=#{newtext}"
+  else
+    newtext = filetext + export_stmt
+    # Uncomment for debugging
+    # puts "no match found"
+    # puts "new=#{newtext}"
+  end
   File.open( file, 'w+' ) { |f|
-    if ( filetext.match( find_regex ) != nil )
-      f << filetext.gsub( find_regex, replacement_text )
-    else
-      f << "#{replacement_text}\n"
-    end
+    f.puts newtext
   }
 end
 
@@ -210,8 +220,9 @@ end # case
 
 # The following patterns assume a 'bash' or comparable shell that uses
 # 'export ENV_VAR_NAME=...' to set values of environment variables.
-find_regex       = /export\s+JAVA_HOME\s+=\s+.*/
-replacement_text = "export JAVA_HOME=\'#{java_home}'"
+# Tested at http://rubular.com/
+find_regex       = /^export\s+JAVA_HOME\s*=\s*?.*?.*/
+replacement_text = java_home
 
 if FileTest.writable?(filepath)
   replace_or_append_text_in_file( filepath, find_regex, replacement_text )

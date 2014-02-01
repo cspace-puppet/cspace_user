@@ -16,7 +16,6 @@ include stdlib # for 'empty()'
 
 class cspace_user::env {
   
-  include cspace_user::env_java_home
   include cspace_environment::osfamily
   $os_family = $cspace_environment::osfamily::os_family
 
