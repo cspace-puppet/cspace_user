@@ -130,6 +130,9 @@ class cspace_user::env {
     $db_user = $default_db_user
   }
   
+  # Uses the value returned by the 'java_home.rb' custom function
+  $java_home = java_home()
+  
   if ( ($::env_lc_all != undef) and (! empty($::env_lc_all)) ) {
     $lc_all = $::env_lc_all
   }
@@ -154,6 +157,7 @@ class cspace_user::env {
     'DB_PASSWORD_NUXEO'     => $db_password_nuxeo,
     'DB_PASSWORD'           => $db_password,
     'DB_USER'               => $db_user,
+    'JAVA_HOME'             => $java_home,
     'LC_ALL'                => $lc_all,
     'MAVEN_OPTS'            => $maven_opts,
   }

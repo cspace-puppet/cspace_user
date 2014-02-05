@@ -91,7 +91,8 @@ class cspace_user::user {
   }
   
   # ---------------------------------------------------------
-  # Manage environment variables in server admin account
+  # Ensure presence of a specified set of environment
+  # variables within the CollectionSpace server admin account
   # ---------------------------------------------------------
   
   case $os_family {
@@ -103,10 +104,11 @@ class cspace_user::user {
       # or in .bash_profile, rather than directly within .bashrc
       # Both of those files are preferable locations for those declarations than .bashrc 
       # See https://www.gnu.org/software/bash/manual/bashref.html#Bash-Startup-Files
+      
       $bash_config_file = "/home/${user_acct}/.bashrc"
       file { 'Ensure presence of bashrc file':
-        path    => $bash_config_file,
         ensure  => file,
+        path    => $bash_config_file,
         owner   => $user_acct,
         group   => $user_acct,
         require => User[ 'Ensure Linux user account' ],
@@ -117,10 +119,11 @@ class cspace_user::user {
     darwin: {
       
       # TODO: See comment above re using a profile file rather than .bashrc.
+      
       $bash_config_file = "/Users/${user_acct}/.bashrc"
       file { 'Ensure presence of bashrc file':
-        path    => $bash_config_file,
         ensure  => file,
+        path    => $bash_config_file,
         owner   => $user_acct,
         group   => 'staff',
         require => User[ 'Ensure OS X user account' ],
@@ -147,21 +150,6 @@ class cspace_user::user {
         path    => $bash_config_file,
         line    => template('cspace_user/env_vars.erb'),
         require => File[ 'Ensure presence of bashrc file' ],
-      }
-    
-      $java_home_script_name = 'set_java_home_env_var.rb'
-      $java_home_script_path = "/tmp/${java_home_script_name}"
-      file { 'Create script to write JAVA_HOME environment variable to bash config file':
-        ensure => present,
-        path   => $java_home_script_path,
-        owner  => 'root',
-        mode   => '0744',
-        source => "puppet:///modules/cspace_user/${java_home_script_name}",
-        require => File_line[ 'Write environment variables to bash config file' ],
-      }
-      exec { 'Write JAVA_HOME environment variable to bash config file':
-        command => "${java_home_script_path} ${bash_config_file}",
-        require => File[ 'Create script to write JAVA_HOME environment variable to bash config file' ],
       }
 
     }
