@@ -24,6 +24,11 @@ class cspace_user::user {
   include cspace_user
   $user_acct = $cspace_user::user_acct_name
   
+  # Uses the value returned by the 'generate_password.rb' custom function
+  $password = generate_password()
+  
+  $initial_password_filename = 'initial_password.txt'
+  
   # ---------------------------------------------------------
   # Ensure presence of CollectionSpace server admin account
   # ---------------------------------------------------------
@@ -40,6 +45,7 @@ class cspace_user::user {
       user { 'Ensure Linux user account':
         ensure     => present,
         name       => $user_acct,
+        password   => $password,
         comment    => 'CollectionSpace server admin',
         home       => $homedir,
         managehome => true,
@@ -50,9 +56,15 @@ class cspace_user::user {
         uid        => '595',
         shell      => '/bin/bash',
       }
-      # file { 'Save Linux user password in a file in their home directory':
-      #   require => User[ 'Ensure Linux user account' ]
-      # }
+      file { 'Save Linux user password in a file in their home directory':
+        ensure  => file,
+        path    => "${homedir}/${initial_password_filename}"
+        owner   => $user_acct,
+        group   => $user_acct,
+        mode    => '600',
+        line    => template('cspace_user/initial_password.erb'),
+        require => User[ 'Ensure Linux user account' ]
+      }
     }
     
     # OS X
@@ -61,6 +73,7 @@ class cspace_user::user {
       user { 'Ensure OS X user account':
         ensure   => present,
         name     => $user_acct,
+        password => $password,
         home     => $homedir,
         system   => false,
         # FIXME: Verify that this ID is unused. One approach may be
@@ -86,9 +99,15 @@ class cspace_user::user {
         unless  => "/bin/test -d ${homedir}",
         require => User[ 'Ensure OS X user account' ]
       }
-      # file { 'Save OS X user password in a file in their home directory':
-      #   require => Exec[ 'Create home directory for OS X user' ],
-      # }
+      file { 'Save OS X user password in a file in their home directory':
+        ensure  => file,
+        path    => "${homedir}/${initial_password_filename}"
+        owner   => $user_acct,
+        group   => 'staff',
+        mode    => '600',
+        line    => template('cspace_user/initial_password.erb'),
+        require => Exec[ 'Create home directory for OS X user' ],
+      }
     }
     
     # Microsoft Windows
