@@ -35,29 +35,36 @@ class cspace_user::user {
   case $os_family {
     
     # Supported Linux OS families
+    $homedir = "/home/${user_acct}"
     RedHat, Debian: {
       user { 'Ensure Linux user account':
         ensure     => present,
         name       => $user_acct,
         comment    => 'CollectionSpace server admin',
-        home       => "/home/${user_acct}",
+        home       => $homedir,
         managehome => true,
         system     => false,
-        # FIXME: Verify that this ID is unused
+        # FIXME: Remove this fixed uid if there's no need for specifying this (or any
+        # other particular uid) as an attribute value. Otherwise, verify that this
+        # uid is unused, or better, invoke a function to return an unused uid.
         uid        => '595',
         shell      => '/bin/bash',
       }
+      # file { 'Save Linux user password in a file in their home directory':
+      #   require => User[ 'Ensure Linux user account' ]
+      # }
     }
     
     # OS X
     darwin: {
+      $homedir = "/Users/${user_acct}"
       user { 'Ensure OS X user account':
         ensure   => present,
         name     => $user_acct,
-        home     => "/Users/${user_acct}",
+        home     => $homedir,
         system   => false,
-        # FIXME: Verify that this ID is unused
-        # possibly via 'dscl . -list /Users UniqueID'
+        # FIXME: Verify that this ID is unused. One approach may be
+        # to munge the output from 'dscl . -list /Users UniqueID'
         #
         # From experimentation, uid may need to be >= 501
         # for home directory creation to succeed.
@@ -76,9 +83,12 @@ class cspace_user::user {
       exec { 'Create home directory for OS X user':
         command => "/usr/sbin/createhomedir -c -u ${user_acct}",
         # Check first if the home directory already exists.
-        unless  => "/bin/test -d /Users/${user_acct}",
+        unless  => "/bin/test -d ${homedir}",
         require => User[ 'Ensure OS X user account' ]
       }
+      # file { 'Save OS X user password in a file in their home directory':
+      #   require => Exec[ 'Create home directory for OS X user' ],
+      # }
     }
     
     # Microsoft Windows
