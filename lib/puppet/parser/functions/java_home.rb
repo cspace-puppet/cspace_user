@@ -28,7 +28,7 @@ DEFAULT_REDHAT_JAVA_HOME = '/usr/java/latest'
 OSX_JAVA_HOME_UTILITY_PATH = '/usr/libexec/java_home'
 
 # ---------------------------------------------------
-# Utility functions
+# Utility functions (methods)
 # ---------------------------------------------------
 
 # Returns the value of the JAVA_HOME environment variable
