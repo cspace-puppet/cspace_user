@@ -19,7 +19,7 @@ class cspace_user::user {
   $os_family = $cspace_environment::osfamily::os_family
   
   include cspace_user::env
-  $env_vars  = $cspace_user::env::cspace_env # hash
+  $env_vars  = $cspace_user::env::cspace_env # 'env_vars' is a hash
   
   include cspace_user
   $user_acct = $cspace_user::user_acct_name
@@ -40,8 +40,8 @@ class cspace_user::user {
   case $os_family {
     
     # Supported Linux OS families
-    $homedir = "/home/${user_acct}"
     RedHat, Debian: {
+      $homedir = "/Users/${user_acct}"
       user { 'Ensure Linux user account':
         ensure     => present,
         name       => $user_acct,
@@ -58,12 +58,12 @@ class cspace_user::user {
       }
       file { 'Save Linux user password in a file in their home directory':
         ensure  => file,
-        path    => "${homedir}/${initial_password_filename}"
+        path    => "${homedir}/${initial_password_filename}",
         owner   => $user_acct,
         group   => $user_acct,
         mode    => '600',
         line    => template('cspace_user/initial_password.erb'),
-        require => User[ 'Ensure Linux user account' ]
+        require => User[ 'Ensure Linux user account' ],
       }
     }
     
@@ -97,11 +97,11 @@ class cspace_user::user {
         command => "/usr/sbin/createhomedir -c -u ${user_acct}",
         # Check first if the home directory already exists.
         unless  => "/bin/test -d ${homedir}",
-        require => User[ 'Ensure OS X user account' ]
+        require => User[ 'Ensure OS X user account' ],
       }
       file { 'Save OS X user password in a file in their home directory':
         ensure  => file,
-        path    => "${homedir}/${initial_password_filename}"
+        path    => "${homedir}/${initial_password_filename}",
         owner   => $user_acct,
         group   => 'staff',
         mode    => '600',
