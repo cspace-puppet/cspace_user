@@ -27,7 +27,7 @@ class cspace_user::user {
   # Uses the value returned by the 'generate_password.rb' custom function
   $password = generate_password()
   
-  $initial_password_filename = 'initial_password.txt'
+  $INITIAL_PASSWORD_FILENAME = 'initial_password.txt'
   
   # ---------------------------------------------------------
   # Ensure presence of CollectionSpace server admin account
@@ -42,13 +42,11 @@ class cspace_user::user {
     # Supported Linux OS families
     RedHat, Debian: {
       $homedir = "/home/${user_acct}"
+      $salted_hash = sha512_salted_hash( $password )
       user { 'Ensure Linux user account':
         ensure     => present,
         name       => $user_acct,
-        # Creating initial passwords for this user account isn't yet working,
-        # having so far tried a number of variations on creating salted password hashes.
-        # The following attribute is a placeholder.
-        # password   => $password,
+        password   => $salted_hash,
         comment    => 'CollectionSpace server admin',
         home       => $homedir,
         managehome => true,
@@ -59,15 +57,15 @@ class cspace_user::user {
         uid        => '595',
         shell      => '/bin/bash',
       }
-      # file { 'Save password for Linux user account to a file in their home directory':
-      #   ensure  => file,
-      #   path    => "${homedir}/${initial_password_filename}",
-      #   owner   => $user_acct,
-      #   group   => $user_acct,
-      #   mode    => '600', # read/write only by file owner
-      #   content => template('cspace_user/initial_password.erb'),
-      #   require => User[ 'Ensure Linux user account' ],
-      # }
+      file { 'Save password for Linux user account to a file in their home directory':
+        ensure  => file,
+        path    => "${homedir}/${INITIAL_PASSWORD_FILENAME}",
+        owner   => $user_acct,
+        group   => $user_acct,
+        mode    => '600', # read/write only by file owner
+        content => template('cspace_user/initial_password.erb'),
+        require => User[ 'Ensure Linux user account' ],
+      }
     }
     
     # OS X
@@ -78,7 +76,8 @@ class cspace_user::user {
         name     => $user_acct,
         # Creating initial passwords for this user account isn't yet working,
         # having so far tried a number of variations on creating salted password hashes.
-        # The following attribute is a placeholder.
+        # The following attribute is a placeholder.  (The Ruby 'crypt'-based method used
+        # for Linux systems, above, likely won't work for OS X.)
         # password => $password,
         home     => $homedir,
         system   => false,
@@ -107,7 +106,7 @@ class cspace_user::user {
       }
       # file { 'Save password for OS X user account to a file in their home directory':
       #   ensure  => file,
-      #   path    => "${homedir}/${initial_password_filename}",
+      #   path    => "${homedir}/${INITIAL_PASSWORD_FILENAME}",
       #   owner   => $user_acct,
       #   group   => 'staff',
       #   mode    => '600', # read/write only by file owner
