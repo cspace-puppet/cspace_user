@@ -42,6 +42,8 @@ class cspace_user::user {
     # Supported Linux OS families
     RedHat, Debian: {
       $homedir = "/home/${user_acct}"
+      # Will only work for (presumably modern) Linux systems
+      # whose shadow password systems use SHA512 hashes
       $salted_hash = sha512_salted_hash( $password )
       user { 'Ensure Linux user account':
         ensure     => present,
