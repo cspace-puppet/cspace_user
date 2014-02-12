@@ -41,11 +41,14 @@ class cspace_user::user {
     
     # Supported Linux OS families
     RedHat, Debian: {
-      $homedir = "/Users/${user_acct}"
+      $homedir = "/home/${user_acct}"
       user { 'Ensure Linux user account':
         ensure     => present,
         name       => $user_acct,
-        password   => $password,
+        # Creating initial passwords for this user account isn't yet working,
+        # having so far tried a number of variations on creating salted password hashes.
+        # The following attribute is a placeholder.
+        # password   => $password,
         comment    => 'CollectionSpace server admin',
         home       => $homedir,
         managehome => true,
@@ -56,15 +59,15 @@ class cspace_user::user {
         uid        => '595',
         shell      => '/bin/bash',
       }
-      file { 'Save Linux user password in a file in their home directory':
-        ensure  => file,
-        path    => "${homedir}/${initial_password_filename}",
-        owner   => $user_acct,
-        group   => $user_acct,
-        mode    => '600',
-        line    => template('cspace_user/initial_password.erb'),
-        require => User[ 'Ensure Linux user account' ],
-      }
+      # file { 'Save password for Linux user account to a file in their home directory':
+      #   ensure  => file,
+      #   path    => "${homedir}/${initial_password_filename}",
+      #   owner   => $user_acct,
+      #   group   => $user_acct,
+      #   mode    => '600', # read/write only by file owner
+      #   content => template('cspace_user/initial_password.erb'),
+      #   require => User[ 'Ensure Linux user account' ],
+      # }
     }
     
     # OS X
@@ -73,7 +76,10 @@ class cspace_user::user {
       user { 'Ensure OS X user account':
         ensure   => present,
         name     => $user_acct,
-        password => $password,
+        # Creating initial passwords for this user account isn't yet working,
+        # having so far tried a number of variations on creating salted password hashes.
+        # The following attribute is a placeholder.
+        # password => $password,
         home     => $homedir,
         system   => false,
         # FIXME: Verify that this ID is unused. One approach may be
@@ -99,15 +105,15 @@ class cspace_user::user {
         unless  => "/bin/test -d ${homedir}",
         require => User[ 'Ensure OS X user account' ],
       }
-      file { 'Save OS X user password in a file in their home directory':
-        ensure  => file,
-        path    => "${homedir}/${initial_password_filename}",
-        owner   => $user_acct,
-        group   => 'staff',
-        mode    => '600',
-        line    => template('cspace_user/initial_password.erb'),
-        require => Exec[ 'Create home directory for OS X user' ],
-      }
+      # file { 'Save password for OS X user account to a file in their home directory':
+      #   ensure  => file,
+      #   path    => "${homedir}/${initial_password_filename}",
+      #   owner   => $user_acct,
+      #   group   => 'staff',
+      #   mode    => '600', # read/write only by file owner
+      #   content => template('cspace_user/initial_password.erb'),
+      #   require => Exec[ 'Create home directory for OS X user' ],
+      # }
     }
     
     # Microsoft Windows

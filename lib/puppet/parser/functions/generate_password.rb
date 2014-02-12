@@ -1,11 +1,18 @@
-# Function to identify the probable location of the JAVA_HOME directory, if present.
+# Function to pseudorandomly generate a plaintext password
+# containing characters from a constrained character set.
+# The passwords generated are not expected to be memorable by a human.
+#
+# This may potentially be suitable for generating first-time
+# passwords for newly-created user accounts, which are soon
+# expected to be changed manually, or to be supplanted by
+# key-based authentication or similar non-password authentication.
 
 # See also "Custom Functions":
 # http://docs.puppetlabs.com/guides/custom_functions.html
 # and "Plugins in Modules"
 # http://docs.puppetlabs.com/guides/plugins_in_modules.html
 
-# The SecureRandom class appears to require Ruby 1.8.7 or later.
+# The SecureRandom class is included with (at least) Ruby 1.8.7 or higher.
 require 'securerandom'
 
 # ---------------------------------------------------
@@ -13,7 +20,7 @@ require 'securerandom'
 # ---------------------------------------------------
 
 MIN_LENGTH = 10
-SELECTED_SPECIAL_CHARS = [ '!', '#', '$', '%', '&', '*', '+', '-', '_' ]
+SELECTED_SPECIAL_CHARS = [ '!', '#', '%', '&', '*', '+', '-', '_' ]
 SPECIAL_CHARS_PRINTABLE = SELECTED_SPECIAL_CHARS.to_s
 
 # ---------------------------------------------------
@@ -59,9 +66,9 @@ end
 
 module Puppet::Parser::Functions
   newfunction(:generate_password, :type => :rvalue, :doc => <<-ENDDOC
-Returns a generated password. The value returned is suggested for use
-as a first-time password when setting up a new user account, and is not
-likely to be memorable by a human.
+Returns a generated, plaintext password. The value returned is suggested
+for use as a first-time password when setting up a new user account, and
+is not likely to be memorable by a human.
 
 *Examples:*
 
@@ -78,7 +85,7 @@ or if is convertable to an integer with a value lower than #{MIN_LENGTH}, will r
 generated password, with a minimum length of #{MIN_LENGTH} characters.
 
 The password will include at least one character from each of three character classes:
-digits (0-9), lowercase letters (a-f), and a set of special characters, '#{SPECIAL_CHARS_PRINTABLE}'
+digits (0-9), lowercase letters (a-f only), and a set of special characters, '#{SPECIAL_CHARS_PRINTABLE}'
 
 ENDDOC
   ) do |args|
