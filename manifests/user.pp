@@ -111,7 +111,7 @@ class cspace_user::user {
       #   path    => "${homedir}/${INITIAL_PASSWORD_FILENAME}",
       #   owner   => $user_acct,
       #   group   => 'staff',
-      #   mode    => '600', # read/write only by file owner
+      #   mode    => '0600', # read/write only by file owner
       #   content => template('cspace_user/initial_password.erb'),
       #   require => Exec[ 'Create home directory for OS X user' ],
       # }
