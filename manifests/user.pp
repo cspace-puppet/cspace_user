@@ -36,6 +36,16 @@ class cspace_user::user {
   # FIXME: Need to specify initial passwords for these user accounts.
   # See requirements for each OS here:
   # http://docs.puppetlabs.com/references/latest/type.html#user-attribute-password
+  #
+  # This has been partly done via the crypt function-created, salted,
+  # SHA-512 hashes currently used below, but that may not work for all
+  # distributions/versions of Linux systems. (As well, OS X uses different
+  # values when setting user passwords, depending on release.)
+  
+  # FIXME: The user home directory paths below are hard-coded (e.g. "/home/...").
+  # These are likely to work in many cases, but they don't account for known
+  # exceptions. See this proposed solution as one possible alternative:
+  # https://ask.puppetlabs.com/question/5373/how-to-reference-a-users-home-directory/?answer=5381#post-id-5381
 
   case $os_family {
     
