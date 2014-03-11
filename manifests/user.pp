@@ -111,10 +111,11 @@ class cspace_user::user {
       # above. And OS X's 'directoryservice' provider does not support the
       # 'managehome' attribute that would automatically remove it.
       exec { 'Create home directory for OS X user':
-        command => "/usr/sbin/createhomedir -c -u ${user_acct}",
+        command   => "/usr/sbin/createhomedir -c -u ${user_acct}",
         # Check first if the home directory already exists.
-        unless  => "/bin/test -d ${homedir}",
-        require => User[ 'Ensure OS X user account' ],
+        unless    => "/bin/test -d ${homedir}",
+        logoutput => on_failure,
+        require   => User[ 'Ensure OS X user account' ],
       }
       # file { 'Save password for OS X user account to a file in their home directory':
       #   ensure  => file,
