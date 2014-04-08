@@ -56,7 +56,7 @@ class cspace_user::env {
   $default_db_password_cspace    = 'cspace'
   $default_db_password_nuxeo     = 'nuxeo'
   $default_db_password           = 'postgres'
-  $default_db_user               = 'postgres'
+  $default_db_user               = 'csadmin'
   $default_lc_all                = 'en_US.utf8'
   $default_maven_opts            =
     '-Xmx768m -XX:MaxPermSize=512m -Dfile.encoding=UTF-8'
@@ -124,10 +124,10 @@ class cspace_user::env {
   }
   
   if ( ($::env_db_user != undef) and (! empty($::env_db_user)) ) {
-    $db_user = $::env_db_user
+    $db_csadmin_user = $::env_db_user
   }
   else {
-    $db_user = $default_db_user
+    $db_csadmin_user = $default_db_user
   }
   
   # Uses the value returned by the 'java_home.rb' custom function
@@ -156,7 +156,7 @@ class cspace_user::env {
     'DB_PASSWORD_CSPACE'    => $db_password_cspace,
     'DB_PASSWORD_NUXEO'     => $db_password_nuxeo,
     'DB_PASSWORD'           => $db_password,
-    'DB_USER'               => $db_user,
+    'DB_CSADMIN_USER'       => $db_csadmin_user,
     'JAVA_HOME'             => $java_home,
     'LC_ALL'                => $lc_all,
     'MAVEN_OPTS'            => $maven_opts,
