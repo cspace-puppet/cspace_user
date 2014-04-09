@@ -53,10 +53,10 @@ class cspace_user::env {
   $default_catalina_opts         = '-Xmx1024m -XX:MaxPermSize=384m'
   $default_catalina_pid          = "${default_catalina_home}/bin/tomcat.pid"
   $default_cspace_jeeserver_home = $default_catalina_home
-  $default_db_password_cspace    = 'cspace'
-  $default_db_password_nuxeo     = 'nuxeo'
-  $default_db_password           = 'postgres'
-  $default_db_user               = 'csadmin'
+  $default_db_csadmin_user       = 'csadmin'
+  $default_db_csadmin_password   = 'csadmin'
+  $default_db_cspace_password    = 'cspace'
+  $default_db_nuxeo_password     = 'nuxeo'
   $default_lc_all                = 'en_US.utf8'
   $default_maven_opts            =
     '-Xmx768m -XX:MaxPermSize=512m -Dfile.encoding=UTF-8'
@@ -101,33 +101,29 @@ class cspace_user::env {
   else {
     $cspace_jeeserver_home = $default_cspace_jeeserver_home
   }
-
-  if ( ($::env_db_password_cspace != undef) and (! empty($::env_db_password_cspace)) ) {
-    $db_password_cspace = $::env_db_password_cspace
-  }
-  else {
-    $db_password_cspace = $default_db_password_cspace
-  }
-
-  if ( ($::env_db_password_nuxeo != undef) and (! empty($::env_db_password_nuxeo)) ) {
-    $db_password_nuxeo = $::env_db_password_nuxeo
-  }
-  else {
-    $db_password_nuxeo = $default_db_password_nuxeo
-  }
-
-  if ( ($::env_db_password != undef) and (! empty($::env_db_password)) ) {
-    $db_password = $::env_db_password
-  }
-  else {
-    $db_password = $default_db_password
-  }
   
-  if ( ($::env_db_user != undef) and (! empty($::env_db_user)) ) {
-    $db_csadmin_user = $::env_db_user
+  # The following value is not currently read from an environment variable
+  $db_csadmin_user = $default_db_csadmin_user
+  
+  if ( ($::env_db_csadmin_password != undef) and (! empty($::env_db_csadmin_password)) ) {
+    $db_csadmin_password = $::env_db_csadmin_password
   }
   else {
-    $db_csadmin_user = $default_db_user
+    $db_csadmin_password = $default_db_csadmin_password
+  }
+
+  if ( ($::env_db_cspace_password != undef) and (! empty($::env_db_cspace_password)) ) {
+    $db_cspace_password = $::env_db_cspace_password
+  }
+  else {
+    $db_cspace_password = $default_db_cspace_password
+  }
+
+  if ( ($::env_db_nuxeo_password != undef) and (! empty($::env_db_nuxeo_password)) ) {
+    $db_nuxeo_password = $::env_db_nuxeo_password
+  }
+  else {
+    $db_nuxeo_password = $default_db_nuxeo_password
   }
   
   # Uses the value returned by the 'java_home.rb' custom function
@@ -153,10 +149,10 @@ class cspace_user::env {
     'CATALINA_OPTS'         => $catalina_opts,
     'CATALINA_PID'          => $catalina_pid,
     'CSPACE_JEESERVER_HOME' => $cspace_jeeserver_home,
-    'DB_PASSWORD_CSPACE'    => $db_password_cspace,
-    'DB_PASSWORD_NUXEO'     => $db_password_nuxeo,
-    'DB_PASSWORD'           => $db_password,
     'DB_CSADMIN_USER'       => $db_csadmin_user,
+    'DB_CSADMIN_PASSWORD'   => $db_csadmin_password,
+    'DB_CSPACE_PASSWORD'    => $db_cspace_password,
+    'DB_NUXEO_PASSWORD'     => $db_nuxeo_password,
     'JAVA_HOME'             => $java_home,
     'LC_ALL'                => $lc_all,
     'MAVEN_OPTS'            => $maven_opts,
