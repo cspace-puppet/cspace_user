@@ -53,7 +53,8 @@ class cspace_user::env {
   $default_catalina_opts         = '-Xmx1024m -XX:MaxPermSize=384m'
   $default_catalina_pid          = "${default_catalina_home}/bin/tomcat.pid"
   $default_cspace_jeeserver_home = $default_catalina_home
-  $default_db_superuser_password = 'postgres'
+  $default_db_admin_user         = 'postgres'
+  $default_db_admin_password     = 'postgres'
   $default_db_csadmin_user       = 'csadmin'
   $default_db_csadmin_password   = 'csadmin'
   $default_db_cspace_password    = 'cspace'
@@ -104,7 +105,10 @@ class cspace_user::env {
   }
   
   # The following value is not currently read from an environment variable
-  $db_superuser_password = $default_db_superuser_password
+  $db_admin_user = $default_db_admin_user
+  
+  # The following value is not currently read from an environment variable
+  $db_admin_password = $default_db_admin_password
   
   # The following value is not currently read from an environment variable
   $db_csadmin_user = $default_db_csadmin_user
@@ -153,7 +157,8 @@ class cspace_user::env {
     'CATALINA_OPTS'         => $catalina_opts,
     'CATALINA_PID'          => $catalina_pid,
     'CSPACE_JEESERVER_HOME' => $cspace_jeeserver_home,
-    'DB_SUPERUSER_PASSWORD' => $db_superuser_password,
+    'DB_ADMIN_USER'         => $db_admin_user,
+    'DB_ADMIN_PASSWORD'     => $db_admin_password,
     'DB_CSADMIN_USER'       => $db_csadmin_user,
     'DB_CSADMIN_PASSWORD'   => $db_csadmin_password,
     'DB_CSPACE_PASSWORD'    => $db_cspace_password,
