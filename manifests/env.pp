@@ -59,6 +59,7 @@ class cspace_user::env {
   $default_db_csadmin_password   = 'csadmin'
   $default_db_cspace_password    = 'cspace'
   $default_db_nuxeo_password     = 'nuxeo'
+  $default_db_reader_password    = 'reader'
   $default_lc_all                = 'en_US.utf8'
   $default_maven_opts            =
     '-Xmx768m -XX:MaxPermSize=512m -Dfile.encoding=UTF-8'
@@ -134,6 +135,13 @@ class cspace_user::env {
     $db_nuxeo_password = $default_db_nuxeo_password
   }
   
+  if ( ($::env_db_reader_password != undef) and (! empty($::env_db_reader_password)) ) {
+    $db_reader_password = $::env_db_reader_password
+  }
+  else {
+    $db_reader_password = $default_db_reader_password
+  }
+  
   # Uses the value returned by the 'java_home.rb' custom function
   $java_home = java_home()
   
@@ -163,6 +171,7 @@ class cspace_user::env {
     'DB_CSADMIN_PASSWORD'   => $db_csadmin_password,
     'DB_CSPACE_PASSWORD'    => $db_cspace_password,
     'DB_NUXEO_PASSWORD'     => $db_nuxeo_password,
+    'DB_READER_PASSWORD'    => $db_reader_password,
     'JAVA_HOME'             => $java_home,
     'LC_ALL'                => $lc_all,
     'MAVEN_OPTS'            => $maven_opts,
