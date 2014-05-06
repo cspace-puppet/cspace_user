@@ -13,23 +13,25 @@ ENV['FACTERLIB'] = "/var/lib/puppet/lib/facter:/var/lib/puppet/facts"
 # Constants
 # ---------------------------------------------------
 
-# Path to the 'alternatives' command on Debian and RedHat-based systems.
+# Default path to the 'alternatives' command on many Debian and
+# RedHat-based systems.
 # (On RedHat-based systems, this path is an alias to '/usr/sbin/alternatives'.)
-ALTERNATIVES_COMMAND     = '/usr/sbin/update-alternatives'
+ALTERNATIVES_COMMAND              = 'update-alternatives'
+DEFAULT_ALTERNATIVES_COMMAND_PATH = "/usr/sbin/#{ALTERNATIVES_COMMAND}"
 
 # Relative path to the 'java' executable within a JAVA_HOME directory
-RELATIVE_PATH_TO_JAVA    = '/bin/java'
+RELATIVE_PATH_TO_JAVA             = '/bin/java'
 
 # Oracle's convention for Java SE 7 on RedHat Linux-based systems appears to be to create
 # a '/usr/java/latest' symlink which will always point to the latest Java version.
 # See http://www.oracle.com/technetwork/java/javase/install-linux-rpm-137089.html
 # (The corresponding 64-bit JDK installation page doesn't mention this convention,
 # but the same behavior was observed with Oracle's Java SE 64-bit RPM packages.)
-DEFAULT_REDHAT_JAVA_HOME = '/usr/java/latest'
+DEFAULT_REDHAT_JAVA_HOME          = '/usr/java/latest'
 
 # The OS X utility 'java_home' "returns the path to a Java home directory from
 # the current user's settings."
-OSX_JAVA_HOME_UTILITY_PATH = '/usr/libexec/java_home'
+OSX_JAVA_HOME_UTILITY_PATH        = '/usr/libexec/java_home'
 
 # ---------------------------------------------------
 # Utility functions
@@ -51,9 +53,38 @@ def env_java_home()
   return env_java_home_val
 end
 
-# Returns the current alternative path to the 'java' executable via
-# the Linux 'alternatives' system. (For a summary of that system,
-# see, for example, http://linux.about.com/library/cmd/blcmdl8_alternatives.htm)
+# Returns the full path to the first instance encountered of the
+# specified executable file ("command") within the current user's
+# executables path.
+# See http://stackoverflow.com/a/5471032
+
+def which(command)
+  filename_extensions = ENV['PATHEXT'] ? ENV['PATHEXT'].split(';') : ['']
+  ENV['PATH'].split(File::PATH_SEPARATOR).each do |path|
+    filename_extensions.each { |extension|
+      executable_file_path = File.join(path, "#{command}#{extension}")
+      return executable_file_path if File.executable? executable_file_path
+    }
+  end
+  return nil
+end
+
+# Returns the full path to the alternatives command (i.e. executable file).
+
+def alternatives_command_path()
+  # First try the default path to the alternatives command.
+  if FileTest.executable?( DEFAULT_ALTERNATIVES_COMMAND_PATH )
+    return DEFAULT_ALTERNATIVES_COMMAND_PATH
+  end
+  # Fall back to searching for the command within the current user's
+  # executables path. (This search will return nil if not found.)
+  return which( ALTERNATIVES_COMMAND )
+end
+
+# Returns the current alternative path to the 'java' executable
+# via the Linux 'alternatives' system. For a summary of that
+# system, see, for example:
+# http://linux.about.com/library/cmd/blcmdl8_alternatives.htm
 
 def java_alternatives_path()
   java_alternatives_val = ''
@@ -62,9 +93,10 @@ def java_alternatives_path()
   # from that line, and strip off the trailing '/bin/java' and any
   # surrounding whitespace from that path, to yield a candidate
   # directory path.
-  if FileTest.executable?( "#{ALTERNATIVES_COMMAND}" )
+  alt_cmd_path = alternatives_command_path()
+  unless cmd.nil? 
     alternatives_cmd_output = \
-      `#{ALTERNATIVES_COMMAND} --display java`
+      `#{alt_cmd_path} --display java`
     alternatives_cmd_output =~ /\s*link currently points to(.*)/
     java_alternatives_candidate = ''
     if alternatives_cmd_output.to_s.strip.length > 0
