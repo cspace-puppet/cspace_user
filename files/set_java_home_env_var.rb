@@ -94,7 +94,7 @@ def java_alternatives_path()
   # surrounding whitespace from that path, to yield a candidate
   # directory path.
   alt_cmd_path = alternatives_command_path()
-  unless cmd.nil? 
+  unless alt_cmd_path.nil? 
     alternatives_cmd_output = \
       `#{alt_cmd_path} --display java`
     alternatives_cmd_output =~ /\s*link currently points to(.*)/
