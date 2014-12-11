@@ -50,7 +50,7 @@ class cspace_user::env {
   
   $default_ant_opts              = '-Xmx1024m -XX:MaxPermSize=512m'
   $default_catalina_home         = '/usr/local/share/apache-tomcat-6.0.33'
-  $default_catalina_opts         = '-Xmx1536m -XX:MaxPermSize=512m'
+  $default_catalina_opts         = '-Xmx1024m -XX:MaxPermSize=384m'
   $default_catalina_pid          = "${default_catalina_home}/bin/tomcat.pid"
   $default_cspace_jeeserver_home = $default_catalina_home
   $default_db_admin_user         = 'postgres'
@@ -62,7 +62,7 @@ class cspace_user::env {
   $default_db_reader_password    = 'reader'
   $default_lc_all                = 'en_US.utf8'
   $default_maven_opts            =
-    '-Xmx768m -XX:MaxPermSize=512m -Dfile.encoding=UTF-8'
+    '-Xmx1024m -XX:MaxPermSize=512m -Dfile.encoding=UTF-8'
 
   # Pick up environment values from values already present in the environment,
   # if available, or use defaults if not.
