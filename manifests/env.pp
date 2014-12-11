@@ -48,9 +48,9 @@ class cspace_user::env {
   # http://docs.puppetlabs.com/guides/environment.html
   # http://docs.puppetlabs.com/hiera/1/
   
-  $default_ant_opts              = '-Xmx768m -XX:MaxPermSize=512m'
+  $default_ant_opts              = '-Xmx1024m -XX:MaxPermSize=512m'
   $default_catalina_home         = '/usr/local/share/apache-tomcat-6.0.33'
-  $default_catalina_opts         = '-Xmx1024m -XX:MaxPermSize=384m'
+  $default_catalina_opts         = '-Xmx1536m -XX:MaxPermSize=512m'
   $default_catalina_pid          = "${default_catalina_home}/bin/tomcat.pid"
   $default_cspace_jeeserver_home = $default_catalina_home
   $default_db_admin_user         = 'postgres'
