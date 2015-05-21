@@ -14,7 +14,25 @@
 
 include stdlib # for 'empty()'
 
-class cspace_user::env {
+# Note: collectionspace:: values are provided by Hiera
+class cspace_user::env (
+  $default_ant_opts              = $collectionspace::ant_opts,
+  $default_catalina_home         = $collectionspace::catalina_home,
+  $default_catalina_opts         = $collectionspace::catalina_opts,
+  $default_catalina_pid          = $collectionspace::catalina_pid,
+  $default_cspace_jeeserver_home = $collectionspace::cspace_jeeserver_home,
+  $default_db_admin_user         = $collectionspace::db_admin_user,
+  $default_db_admin_password     = $collectionspace::db_admin_password,
+  $default_db_csadmin_user       = $collectionspace::db_csadmin_user,
+  $default_db_csadmin_password   = $collectionspace::db_csadmin_password,
+  $default_db_cspace_password    = $collectionspace::db_cspace_password,
+  $default_db_nuxeo_password     = $collectionspace::db_nuxeo_password,
+  $default_db_reader_password    = $collectionspace::db_reader_password,
+  $default_lc_all                = $collectionspace::lc_all,
+  $default_maven_opts            = $collectionspace::maven_opts,
+  )
+
+ {
   
   include cspace_environment::osfamily
   $os_family = $cspace_environment::osfamily::os_family
@@ -37,32 +55,6 @@ class cspace_user::env {
   # presence of any particular hash utility - is by extracting a slice from
   # a Type 4 UUID and incorporating into a generated password; e.g.:
   # "uuidgen | tr '[:upper:]' '[:lower:]' | cut -c 1-8"
-
-  # FIXME: the values below are hard-coded global defaults. They
-  # could more flexibly be read in from a per-node Environment,
-  # from other external configuration, or from Heira.
-  #
-  # See, for instance:
-  # http://puppetlabs.com/blog/the-problem-with-separating-data-from-puppet-code
-  # and specifically:
-  # http://docs.puppetlabs.com/guides/environment.html
-  # http://docs.puppetlabs.com/hiera/1/
-  
-  $default_ant_opts              = '-Xmx1024m -XX:MaxPermSize=512m'
-  $default_catalina_home         = '/usr/local/share/apache-tomcat-6.0.33'
-  $default_catalina_opts         = '-Xmx1024m -XX:MaxPermSize=384m'
-  $default_catalina_pid          = "${default_catalina_home}/bin/tomcat.pid"
-  $default_cspace_jeeserver_home = $default_catalina_home
-  $default_db_admin_user         = 'postgres'
-  $default_db_admin_password     = 'postgres'
-  $default_db_csadmin_user       = 'csadmin'
-  $default_db_csadmin_password   = 'csadmin'
-  $default_db_cspace_password    = 'cspace'
-  $default_db_nuxeo_password     = 'nuxeo'
-  $default_db_reader_password    = 'reader'
-  $default_lc_all                = 'en_US.utf8'
-  $default_maven_opts            =
-    '-Xmx1024m -XX:MaxPermSize=512m -Dfile.encoding=UTF-8'
 
   # Pick up environment values from values already present in the environment,
   # if available, or use defaults if not.

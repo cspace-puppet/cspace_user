@@ -11,5 +11,6 @@
 # Sample Usage:
 #
 
-class cspace_user ( $user_acct_name = hiera('collectionspace::cspace_user') ) {
+# Note: collectionspace:: values are provided by Hiera
+class cspace_user ( $collectionspace::cspace_user ) {
 }
