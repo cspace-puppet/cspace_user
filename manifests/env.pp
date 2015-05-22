@@ -21,12 +21,14 @@ class cspace_user::env (
   $heira_configured_catalina_pid          = hiera('collectionspace::catalina_pid'),
   $heira_configured_cspace_jeeserver_home = hiera('collectionspace::cspace_jeeserver_home'),
   $heira_configured_db_admin_user         = hiera('collectionspace::db_admin_user'),
-  $heira_configured_db_admin_password     = hiera('collectionspace::db_admin_password'),
+  # This and several other password values, if not present in the local environment or in Hiera
+  # configuration, default to values returned by the 'generate_password.rb' custom function
+  $heira_configured_db_admin_password     = hiera('collectionspace::db_admin_password', generate_password()),
   $heira_configured_db_csadmin_user       = hiera('collectionspace::db_csadmin_user'),
-  $heira_configured_db_csadmin_password   = hiera('collectionspace::db_csadmin_password'),
-  $heira_configured_db_cspace_password    = hiera('collectionspace::db_cspace_password'),
-  $heira_configured_db_nuxeo_password     = hiera('collectionspace::db_nuxeo_password'),
-  $heira_configured_db_reader_password    = hiera('collectionspace::db_reader_password'),
+  $heira_configured_db_csadmin_password   = hiera('collectionspace::db_csadmin_password', generate_password()),
+  $heira_configured_db_cspace_password    = hiera('collectionspace::db_cspace_password', generate_password()),
+  $heira_configured_db_nuxeo_password     = hiera('collectionspace::db_nuxeo_password', generate_password()),
+  $heira_configured_db_reader_password    = hiera('collectionspace::db_reader_password', generate_password()),
   $heira_configured_lc_all                = hiera('collectionspace::lc_all'),
   $heira_configured_maven_opts            = hiera('collectionspace::maven_opts'),
   )
@@ -96,14 +98,23 @@ class cspace_user::env (
     $cspace_jeeserver_home = $heira_configured_cspace_jeeserver_home
   }
   
-  # The following value is not currently read from an environment variable
-  $db_admin_user = $heira_configured_db_admin_user
+  if ( ($::env_db_admin_user != undef) and (! empty($::env_db_admin_user)) ) {
+    $db_admin_user = $::env_db_admin_user
+  } else {
+    $db_admin_user = $heira_configured_db_admin_user
+  }
   
-  # The following value is not currently read from an environment variable
-  $db_admin_password = $heira_configured_db_admin_password
+  if ( ($::env_db_admin_password != undef) and (! empty($::env_db_admin_password)) ) {
+    $db_admin_password = $::env_db_admin_password
+  } else {
+    $db_admin_password = $heira_configured_db_admin_password
+  }
   
-  # The following value is not currently read from an environment variable
-  $db_csadmin_user = $heira_configured_db_csadmin_user
+  if ( ($::env_db_csadmin_user != undef) and (! empty($::env_db_csadmin_user)) ) {
+    $db_csadmin_user = $::env_db_csadmin_user
+  } else {
+    $db_csadmin_user = $heira_configured_db_csadmin_user
+  }
   
   if ( ($::env_db_csadmin_password != undef) and (! empty($::env_db_csadmin_password)) ) {
     $db_csadmin_password = $::env_db_csadmin_password
