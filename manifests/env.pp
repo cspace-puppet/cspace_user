@@ -14,22 +14,21 @@
 
 include stdlib # for 'empty()'
 
-# Note: collectionspace:: values are provided by Hiera
 class cspace_user::env (
-  $default_ant_opts              = $collectionspace::ant_opts,
-  $default_catalina_home         = $collectionspace::catalina_home,
-  $default_catalina_opts         = $collectionspace::catalina_opts,
-  $default_catalina_pid          = $collectionspace::catalina_pid,
-  $default_cspace_jeeserver_home = $collectionspace::cspace_jeeserver_home,
-  $default_db_admin_user         = $collectionspace::db_admin_user,
-  $default_db_admin_password     = $collectionspace::db_admin_password,
-  $default_db_csadmin_user       = $collectionspace::db_csadmin_user,
-  $default_db_csadmin_password   = $collectionspace::db_csadmin_password,
-  $default_db_cspace_password    = $collectionspace::db_cspace_password,
-  $default_db_nuxeo_password     = $collectionspace::db_nuxeo_password,
-  $default_db_reader_password    = $collectionspace::db_reader_password,
-  $default_lc_all                = $collectionspace::lc_all,
-  $default_maven_opts            = $collectionspace::maven_opts,
+  $heira_configured_ant_opts              = hiera('collectionspace::ant_opts'),
+  $heira_configured_catalina_home         = hiera('collectionspace::catalina_home'),
+  $heira_configured_catalina_opts         = hiera('collectionspace::catalina_opts'),
+  $heira_configured_catalina_pid          = hiera('collectionspace::catalina_pid'),
+  $heira_configured_cspace_jeeserver_home = hiera('collectionspace::cspace_jeeserver_home'),
+  $heira_configured_db_admin_user         = hiera('collectionspace::db_admin_user'),
+  $heira_configured_db_admin_password     = hiera('collectionspace::db_admin_password'),
+  $heira_configured_db_csadmin_user       = hiera('collectionspace::db_csadmin_user'),
+  $heira_configured_db_csadmin_password   = hiera('collectionspace::db_csadmin_password'),
+  $heira_configured_db_cspace_password    = hiera('collectionspace::db_cspace_password'),
+  $heira_configured_db_nuxeo_password     = hiera('collectionspace::db_nuxeo_password'),
+  $heira_configured_db_reader_password    = hiera('collectionspace::db_reader_password'),
+  $heira_configured_lc_all                = hiera('collectionspace::lc_all'),
+  $heira_configured_maven_opts            = hiera('collectionspace::maven_opts'),
   )
 
  {
@@ -56,8 +55,8 @@ class cspace_user::env (
   # a Type 4 UUID and incorporating into a generated password; e.g.:
   # "uuidgen | tr '[:upper:]' '[:lower:]' | cut -c 1-8"
 
-  # Pick up environment values from values already present in the environment,
-  # if available, or use defaults if not.
+  # Obtain values from the local host's environment variables, if present,
+  # or if not, use values configured in Hiera.
   #
   # The environment variables below have been added as custom Facter facts
   # via the lib/facter/env.rb script in this module.
@@ -66,72 +65,72 @@ class cspace_user::env (
     $ant_opts = $::env_ant_opts
   }
   else {
-    $ant_opts = $default_ant_opts
+    $ant_opts = $heira_configured_ant_opts
   }
 
   if ( ($::env_catalina_home != undef) and (! empty($::env_catalina_home)) ) {
     $catalina_home = $::env_catalina_home
   }
   else {
-    $catalina_home = $default_catalina_home
+    $catalina_home = $heira_configured_catalina_home
   }
 
   if ( ($::env_catalina_opts != undef) and (! empty($::env_catalina_opts)) ) {
     $catalina_opts = $::env_catalina_opts
   }
   else {
-    $catalina_opts = $default_catalina_opts
+    $catalina_opts = $heira_configured_catalina_opts
   }
 
   if ( ($::env_catalina_pid != undef) and (! empty($::env_catalina_pid)) ) {
     $catalina_pid = $::env_catalina_pid
   }
   else {
-    $catalina_pid = $default_catalina_pid
+    $catalina_pid = $heira_configured_catalina_pid
   }
 
   if ( ($::env_cspace_jeeserver_home != undef) and (! empty($::env_cspace_jeeserver_home)) ) {
     $cspace_jeeserver_home = $::env_cspace_jeeserver_home
   }
   else {
-    $cspace_jeeserver_home = $default_cspace_jeeserver_home
+    $cspace_jeeserver_home = $heira_configured_cspace_jeeserver_home
   }
   
   # The following value is not currently read from an environment variable
-  $db_admin_user = $default_db_admin_user
+  $db_admin_user = $heira_configured_db_admin_user
   
   # The following value is not currently read from an environment variable
-  $db_admin_password = $default_db_admin_password
+  $db_admin_password = $heira_configured_db_admin_password
   
   # The following value is not currently read from an environment variable
-  $db_csadmin_user = $default_db_csadmin_user
+  $db_csadmin_user = $heira_configured_db_csadmin_user
   
   if ( ($::env_db_csadmin_password != undef) and (! empty($::env_db_csadmin_password)) ) {
     $db_csadmin_password = $::env_db_csadmin_password
   }
   else {
-    $db_csadmin_password = $default_db_csadmin_password
+    $db_csadmin_password = $heira_configured_db_csadmin_password
   }
 
   if ( ($::env_db_cspace_password != undef) and (! empty($::env_db_cspace_password)) ) {
     $db_cspace_password = $::env_db_cspace_password
   }
   else {
-    $db_cspace_password = $default_db_cspace_password
+    $db_cspace_password = $heira_configured_db_cspace_password
   }
 
   if ( ($::env_db_nuxeo_password != undef) and (! empty($::env_db_nuxeo_password)) ) {
     $db_nuxeo_password = $::env_db_nuxeo_password
   }
   else {
-    $db_nuxeo_password = $default_db_nuxeo_password
+    $db_nuxeo_password = $heira_configured_db_nuxeo_password
   }
   
   if ( ($::env_db_reader_password != undef) and (! empty($::env_db_reader_password)) ) {
     $db_reader_password = $::env_db_reader_password
   }
   else {
-    $db_reader_password = $default_db_reader_password
+    $db_reader_password = $heira_configured_db_reader_password
   }
   
   # Uses the value returned by the 'java_home.rb' custom function
@@ -141,14 +140,14 @@ class cspace_user::env (
     $lc_all = $::env_lc_all
   }
   else {
-    $lc_all = $default_lc_all
+    $lc_all = $heira_configured_lc_all
   }
 
   if ( ($::env_maven_opts != undef) and (! empty($::env_maven_opts)) ) {
     $maven_opts = $::env_maven_opts
   }
   else {
-    $maven_opts = $default_maven_opts
+    $maven_opts = $heira_configured_maven_opts
   }
 
   $cspace_env = {
