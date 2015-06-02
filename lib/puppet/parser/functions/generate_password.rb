@@ -20,7 +20,7 @@ require 'securerandom'
 # ---------------------------------------------------
 
 MIN_LENGTH = 10
-SELECTED_SPECIAL_CHARS = [ '!', '#', '%', '&', '*', '+', '-', '_' ]
+SELECTED_SPECIAL_CHARS = [ '!', '#', '%', '*', '+', '-', '_' ]
 SPECIAL_CHARS_PRINTABLE = SELECTED_SPECIAL_CHARS.to_s
 
 # ---------------------------------------------------
