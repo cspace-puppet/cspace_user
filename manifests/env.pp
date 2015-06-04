@@ -19,6 +19,7 @@ class cspace_user::env (
   $heira_configured_catalina_home         = hiera('collectionspace::catalina_home'),
   $heira_configured_catalina_opts         = hiera('collectionspace::catalina_opts'),
   $heira_configured_catalina_pid          = hiera('collectionspace::catalina_pid'),
+  $heira_configured_cspace_instance_id    = hiera('collectionspace::cspace_instance_id'),
   $heira_configured_cspace_jeeserver_home = hiera('collectionspace::cspace_jeeserver_home'),
   $heira_configured_db_admin_user         = hiera('collectionspace::db_admin_user'),
   # This and several other password values, if not present in the local environment or in Hiera
@@ -27,7 +28,9 @@ class cspace_user::env (
   $heira_configured_db_csadmin_user       = hiera('collectionspace::db_csadmin_user'),
   $heira_configured_db_csadmin_password   = hiera('collectionspace::db_csadmin_password', generate_password()),
   $heira_configured_db_cspace_password    = hiera('collectionspace::db_cspace_password', generate_password()),
+  $heira_configured_db_host               = hiera('collectionspace::db_host'),
   $heira_configured_db_nuxeo_password     = hiera('collectionspace::db_nuxeo_password', generate_password()),
+  $heira_configured_db_port               = hiera('collectionspace::db_port'),
   $heira_configured_db_reader_password    = hiera('collectionspace::db_reader_password', generate_password()),
   $heira_configured_lc_all                = hiera('collectionspace::lc_all'),
   $heira_configured_maven_opts            = hiera('collectionspace::maven_opts'),
@@ -90,6 +93,13 @@ class cspace_user::env (
   else {
     $catalina_pid = $heira_configured_catalina_pid
   }
+  
+  if ( ($::env_cspace_instance_id != undef) and (! empty($::env_cspace_instance_id)) ) {
+    $cspace_instance_id = $::env_cspace_instance_id
+  }
+  else {
+    $cspace_instance_id = $heira_configured_cspace_instance_id
+  }
 
   if ( ($::env_cspace_jeeserver_home != undef) and (! empty($::env_cspace_jeeserver_home)) ) {
     $cspace_jeeserver_home = $::env_cspace_jeeserver_home
@@ -130,11 +140,25 @@ class cspace_user::env (
     $db_cspace_password = $heira_configured_db_cspace_password
   }
 
+  if ( ($::env_db_host != undef) and (! empty($::env_db_host)) ) {
+    $db_host = $::env_db_host
+  }
+  else {
+    $db_host = $heira_configured_db_host
+  }
+
   if ( ($::env_db_nuxeo_password != undef) and (! empty($::env_db_nuxeo_password)) ) {
     $db_nuxeo_password = $::env_db_nuxeo_password
   }
   else {
     $db_nuxeo_password = $heira_configured_db_nuxeo_password
+  }
+  
+  if ( ($::env_db_port != undef) and (! empty($::env_db_port)) ) {
+    $db_port = $::env_db_port
+  }
+  else {
+    $db_port = $heira_configured_db_port
   }
   
   if ( ($::env_db_reader_password != undef) and (! empty($::env_db_reader_password)) ) {
@@ -166,13 +190,16 @@ class cspace_user::env (
     'CATALINA_HOME'         => $catalina_home,
     'CATALINA_OPTS'         => $catalina_opts,
     'CATALINA_PID'          => $catalina_pid,
+    'CSPACE_INSTANCE_ID'    => $cspace_instance_id,
     'CSPACE_JEESERVER_HOME' => $cspace_jeeserver_home,
     'DB_ADMIN_USER'         => $db_admin_user,
     'DB_ADMIN_PASSWORD'     => $db_admin_password,
     'DB_CSADMIN_USER'       => $db_csadmin_user,
     'DB_CSADMIN_PASSWORD'   => $db_csadmin_password,
     'DB_CSPACE_PASSWORD'    => $db_cspace_password,
+    'DB_HOST'               => $db_host,
     'DB_NUXEO_PASSWORD'     => $db_nuxeo_password,
+    'DB_PORT'               => $db_port,
     'DB_READER_PASSWORD'    => $db_reader_password,
     'JAVA_HOME'             => $java_home,
     'LC_ALL'                => $lc_all,
