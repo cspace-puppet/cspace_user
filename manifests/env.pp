@@ -21,6 +21,7 @@ class cspace_user::env (
   $heira_configured_catalina_pid          = hiera('collectionspace::catalina_pid'),
   $heira_configured_cspace_instance_id    = hiera('collectionspace::cspace_instance_id'),
   $heira_configured_cspace_jeeserver_home = hiera('collectionspace::cspace_jeeserver_home'),
+  $heira_configured_jee_port              = hiera('collectionspace::jee_port'),
   $heira_configured_db_admin_user         = hiera('collectionspace::db_admin_user'),
   # This and several other password values, if not present in the local environment or in Hiera
   # configuration, default to values returned by the 'generate_password.rb' custom function
@@ -64,7 +65,8 @@ class cspace_user::env (
   # or if not, use values configured in Hiera.
   #
   # The environment variables below have been added as custom Facter facts
-  # via the lib/facter/env.rb script in this module.
+  # via the lib/facter/env.rb script in this module, which then makes them
+  # available for use within Puppet.
 
   if ( ($::env_ant_opts != undef) and (! empty($::env_ant_opts)) ) {
     $ant_opts = $::env_ant_opts
@@ -106,6 +108,13 @@ class cspace_user::env (
   }
   else {
     $cspace_jeeserver_home = $heira_configured_cspace_jeeserver_home
+  }
+  
+  if ( ($::env_jee_port != undef) and (! empty($::env_jee_port)) ) {
+    $jee_port = $::env_jee_port
+  }
+  else {
+    $jee_port = $heira_configured_jee_port
   }
   
   if ( ($::env_db_admin_user != undef) and (! empty($::env_db_admin_user)) ) {
@@ -192,6 +201,7 @@ class cspace_user::env (
     'CATALINA_PID'          => $catalina_pid,
     'CSPACE_INSTANCE_ID'    => $cspace_instance_id,
     'CSPACE_JEESERVER_HOME' => $cspace_jeeserver_home,
+    'JEE_PORT'              => $jee_port,
     'DB_ADMIN_USER'         => $db_admin_user,
     'DB_ADMIN_PASSWORD'     => $db_admin_password,
     'DB_CSADMIN_USER'       => $db_csadmin_user,
