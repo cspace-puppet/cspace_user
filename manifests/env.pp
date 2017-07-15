@@ -218,7 +218,7 @@ class cspace_user::env (
     'DB_HOST'               => $db_host,
     'DB_NUXEO_PASSWORD'     => $db_nuxeo_password,
     'DB_PORT'               => $db_port,
-	'CSPACE_CORE_CREATE_DISABLED_OPT' => $cspace_core_create_disabled_opt
+	'CSPACE_CORE_CREATE_DISABLED_OPT' => $cspace_core_create_disabled_opt,
     'DB_READER_PASSWORD'    => $db_reader_password,
     'JAVA_HOME'             => $java_home,
     'LC_ALL'                => $lc_all,
