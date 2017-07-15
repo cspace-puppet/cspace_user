@@ -32,6 +32,7 @@ class cspace_user::env (
   $heira_configured_db_host               = hiera('collectionspace::db_host'),
   $heira_configured_db_nuxeo_password     = hiera('collectionspace::db_nuxeo_password', generate_password()),
   $heira_configured_db_port               = hiera('collectionspace::db_port'),
+  $heira_configured_cspace_core_create_disabled_opt = hiera('collectionspace::cspace_core_create_disabled_opt'),
   $heira_configured_db_reader_password    = hiera('collectionspace::db_reader_password', generate_password()),
   $heira_configured_lc_all                = hiera('collectionspace::lc_all'),
   $heira_configured_maven_opts            = hiera('collectionspace::maven_opts'),
@@ -170,6 +171,13 @@ class cspace_user::env (
     $db_port = $heira_configured_db_port
   }
   
+  if ( ($::env_cspace_core_create_disabled_opt != undef) and (! empty($::env_cspace_core_create_disabled_opt)) ) {
+    $cspace_core_create_disabled_opt = $::env_cspace_core_create_disabled_opt
+  }
+  else {
+    $cspace_core_create_disabled_opt = $heira_configured_cspace_core_create_disabled_opt
+  }
+  
   if ( ($::env_db_reader_password != undef) and (! empty($::env_db_reader_password)) ) {
     $db_reader_password = $::env_db_reader_password
   }
@@ -210,6 +218,7 @@ class cspace_user::env (
     'DB_HOST'               => $db_host,
     'DB_NUXEO_PASSWORD'     => $db_nuxeo_password,
     'DB_PORT'               => $db_port,
+	'CSPACE_CORE_CREATE_DISABLED_OPT' => $cspace_core_create_disabled_opt
     'DB_READER_PASSWORD'    => $db_reader_password,
     'JAVA_HOME'             => $java_home,
     'LC_ALL'                => $lc_all,
