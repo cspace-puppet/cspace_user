@@ -1,3 +1,6 @@
+#
+# puppet apply tests/generate_password.pp --noop --modulepath=..
+#
 notify { 'Generate password with default length':
   message => generate_password(),
 }
