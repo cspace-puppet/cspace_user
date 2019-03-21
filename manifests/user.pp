@@ -17,22 +17,22 @@ include stdlib # for file_line
 class cspace_user::user {
 
   $os_family = $cspace_environment::osfamily::os_family
-  
+
   include cspace_user::env
   $env_vars  = $cspace_user::env::cspace_env # 'env_vars' is a hash
-  
+
   include cspace_user
   $user_acct = $cspace_user::user_acct_name
-  
+
   # Uses the value returned by the 'generate_password.rb' custom function
   $password = generate_password()
-  
-  $INITIAL_PASSWORD_FILENAME = 'initial_password.txt'
-  
+
+  $initial_password_filename = 'initial_password.txt'
+
   # ---------------------------------------------------------
   # Ensure presence of CollectionSpace server admin account
   # ---------------------------------------------------------
-  
+
   # FIXME: Need to specify initial passwords for these user accounts.
   # See requirements for each OS here:
   # http://docs.puppetlabs.com/references/latest/type.html#user-attribute-password
@@ -41,16 +41,16 @@ class cspace_user::user {
   # SHA-512 hashes currently used below, but that may not work for all
   # distributions/versions of Linux systems. (As well, OS X uses different
   # values when setting user passwords, depending on release.)
-  
+
   # FIXME: The user home directory paths below are hard-coded (e.g. "/home/...").
   # These are likely to work in many cases, but they don't account for known
   # exceptions. See this proposed solution as one possible alternative:
   # https://ask.puppetlabs.com/question/5373/how-to-reference-a-users-home-directory/?answer=5381#post-id-5381
 
   case $os_family {
-    
+
     # Supported Linux OS families
-    RedHat, Debian: {
+    'RedHat', 'Debian': {
       $homedir = "/home/${user_acct}"
       # Will only work for (presumably modern) Linux systems
       # whose shadow password systems use SHA512 hashes
@@ -71,7 +71,7 @@ class cspace_user::user {
       }
       file { 'Save password for Linux user account to a file in their home directory':
         ensure  => file,
-        path    => "${homedir}/${INITIAL_PASSWORD_FILENAME}",
+        path    => "${homedir}/${initial_password_filename}",
         owner   => $user_acct,
         group   => $user_acct,
         mode    => '0600', # read/write only by file owner
@@ -79,9 +79,9 @@ class cspace_user::user {
         require => User[ 'Ensure Linux user account' ],
       }
     }
-    
+
     # OS X
-    darwin: {
+    'darwin': {
       $homedir = "/Users/${user_acct}"
       user { 'Ensure OS X user account':
         ensure   => present,
@@ -119,7 +119,7 @@ class cspace_user::user {
       }
       # file { 'Save password for OS X user account to a file in their home directory':
       #   ensure  => file,
-      #   path    => "${homedir}/${INITIAL_PASSWORD_FILENAME}",
+      #   path    => "${homedir}/${initial_password_filename}",
       #   owner   => $user_acct,
       #   group   => 'staff',
       #   mode    => '0600', # read/write only by file owner
@@ -127,31 +127,31 @@ class cspace_user::user {
       #   require => Exec[ 'Create home directory for OS X user' ],
       # }
     }
-    
+
     # Microsoft Windows
-    windows: {
+    'windows': {
     }
-    
-    default: {
+
+    'default': {
     }
-    
+
   }
-  
+
   # ---------------------------------------------------------
   # Ensure presence of a specified set of environment
   # variables within the CollectionSpace server admin account
   # ---------------------------------------------------------
-  
+
   case $os_family {
-    
-    RedHat, Debian: {
-      
+
+    'RedHat', 'Debian': {
+
       # TODO: Find a way to get builds to continue to work in the cspace_source module
       # when environment variables are declared (in order of preference) in .profile
       # or in .bash_profile, rather than directly within .bashrc
-      # Both of those files are preferable locations for those declarations than .bashrc 
+      # Both of those files are preferable locations for those declarations than .bashrc
       # See https://www.gnu.org/software/bash/manual/bashref.html#Bash-Startup-Files
-      
+
       $bash_config_file = "/home/${user_acct}/.bashrc"
       file { 'Ensure presence of bashrc file':
         ensure  => file,
@@ -160,13 +160,13 @@ class cspace_user::user {
         group   => $user_acct,
         require => User[ 'Ensure Linux user account' ],
       }
-      
+
     }
     # OS X
-    darwin: {
-      
+    'darwin': {
+
       # TODO: See comment above re using a profile file rather than .bashrc.
-      
+
       $bash_config_file = "/Users/${user_acct}/.bashrc"
       file { 'Ensure presence of bashrc file':
         ensure  => file,
@@ -175,19 +175,19 @@ class cspace_user::user {
         group   => 'staff',
         require => User[ 'Ensure OS X user account' ],
       }
-      
+
     }
     # Microsoft Windows
-    windows: {
+    'windows': {
     }
-    default: {
+    'default': {
     }
   }
-  
+
   case $os_family {
-    
-    RedHat, Debian, darwin: {
-      
+
+    'RedHat', 'Debian', 'darwin': {
+
       $starting_delimiter = '# Start of environment variable declarations inserted by Puppet code'
       $ending_delimiter   = '# End of environment variable declations inserted by Puppet code'
       # The 'env_vars.erb' template, invoked below, expects to find an $env_vars hash,
@@ -201,11 +201,11 @@ class cspace_user::user {
 
     }
     # Microsoft Windows
-    windows: {
+    'windows': {
     }
-    default: {
+    'default': {
     }
   }
-  
+
 
 }
